@@ -16,13 +16,13 @@
 
 
 #' panel series
-#' 
+#'
 #' A class for panel series for which several useful computations and
 #' data transformations are available.
-#' 
+#'
 #' The functions `between`, `Between`, and `Within` perform specific
 #' data transformations, i. e. the between and within transformation.
-#' 
+#'
 #' `between` returns a vector containing the individual means (over
 #' time) with the length of the vector equal to the number of
 #' individuals (if `effect = "individual"` (default); if `effect =
@@ -32,12 +32,12 @@
 #' the values in deviation from the individual means (if `effect =
 #' "individual"`, from time means if `effect = "time"`), the so called
 #' demeaned data.
-#' 
+#'
 #' For `between`, `Between`, and `Within` in presence of NA values it
 #' can be useful to supply `na.rm = TRUE` as an additional argument to
 #' keep as many observations as possible in the resulting
 #' transformation, see also **Examples**.
-#' 
+#'
 #' @name pseries
 #' @aliases pseries
 #' @param x,object a `pseries` or a `summary.pseries` object,
@@ -61,42 +61,42 @@
 #'     differencing.
 #' @keywords classes
 #' @examples
-#' 
+#'
 #' # First, create a pdata.frame
 #' data("EmplUK", package = "plm")
 #' Em <- pdata.frame(EmplUK)
-#' 
+#'
 #' # Then extract a series, which becomes additionally a pseries
 #' z <- Em$output
 #' class(z)
-#' 
+#'
 #' # obtain the matrix representation
 #' as.matrix(z)
-#' 
+#'
 #' # compute the between and within transformations
 #' between(z)
 #' Within(z)
-#' 
+#'
 #' # Between replicates the values for each time observation
 #' Between(z)
-#' 
+#'
 #' # between, Between, and Within transformations on other dimension
 #' between(z, effect = "time")
 #' Between(z, effect = "time")
 #' Within(z, effect = "time")
-#' 
+#'
 #' # NA treatment for between, Between, and Within
 #' z2 <- z
 #' z2[length(z2)] <- NA # set last value to NA
 #' between(z2, na.rm = TRUE) # non-NA value for last individual
 #' Between(z2, na.rm = TRUE) # only the NA observation is lost
 #' Within(z2, na.rm = TRUE)  # only the NA observation is lost
-#' 
+#'
 #' sum(is.na(Between(z2))) # 9 observations lost due to one NA value
 #' sum(is.na(Between(z2, na.rm = TRUE))) # only the NA observation is lost
 #' sum(is.na(Within(z2))) # 9 observations lost due to one NA value
 #' sum(is.na(Within(z2, na.rm = TRUE))) # only the NA observation is lost
-#' 
+#'
 NULL
 
 
@@ -152,12 +152,12 @@ as.matrix.pseries <- function(x, idbyrow = TRUE, ...){
 plot.pseries <- function(x, plot = c("lattice", "superposed"),
                          scale = FALSE, transparency = TRUE,
                          col = "blue", lwd = 1, ...) {
-    
+
     if(scale) {
         scalefun <- function(x) scale(x)
     } else {
         scalefun <- function(x) return(x)}
-    
+
     nx <- as.numeric(x)
     ind <- attr(x, "index")[[1]]
     tind <- attr(x, "index")[[2]] # possibly as.numeric():
@@ -165,12 +165,12 @@ plot.pseries <- function(x, plot = c("lattice", "superposed"),
                                   # but loses time labels
 
     xdata <- data.frame(nx=nx, ind=ind, tind=tind)
-    
+
     switch(match.arg(plot),
            lattice = {
                ##require(lattice) # make a ggplot2 version
                xyplot(nx ~ tind | ind, data = xdata, type = "l", col = col, ...)
-               
+
            }, superposed = {
                ylim <- c(min(tapply(scalefun(nx), ind, min, na.rm = TRUE)),
                          max(tapply(scalefun(nx), ind, max, na.rm = TRUE)))
@@ -183,7 +183,7 @@ plot.pseries <- function(x, plot = c("lattice", "superposed"),
                     ylim = ylim, xlab = "", ylab = "", xaxt = "n", ...)
                axis(1, at = as.numeric(unique(tind)),
                     labels = unique(tind))
-               
+
                    ## determine lwd and transparency level as a function
                    ## of n
                if(transparency) {
@@ -199,8 +199,8 @@ plot.pseries <- function(x, plot = c("lattice", "superposed"),
                    tindi <- tind[ind == unind[i]]
                    lines(x = tindi, y = scalefun(nxi),
                          col = col, lwd = lwd, ...)
-               }               
-           })    
+               }
+           })
 }
 
 #' @rdname pseries
@@ -214,13 +214,13 @@ summary.pseries <- function(object, ...) {
         Btime <-  Between(object, effect = "time", na.rm = TRUE)
         ## res <- structure(c(total = sumsq(object),
         ##                    between_id = sumsq(Bid),
-        ##                    between_time = sumsq(Btime)), 
+        ##                    between_time = sumsq(Btime)),
         ##                  class = c("summary.pseries", "numeric"))
         res <- structure(c(total = sum( (na.omit(object) - mean(object, na.rm = TRUE)) ^ 2),
                            between_id = sum( (na.omit(Bid) - mean(Bid, na.rm = TRUE)) ^ 2),
-                           between_time = sum( (na.omit(Btime) - mean(Btime, na.rm = TRUE)) ^ 2)), 
+                           between_time = sum( (na.omit(Btime) - mean(Btime, na.rm = TRUE)) ^ 2)),
                            class = c("summary.pseries", "numeric"))
-        
+
     } else {
         class(object) <- setdiff(class(object), c("pseries"))
         res <- summary(object, ...)
@@ -318,7 +318,7 @@ Sum.matrix <- function(x, effect,...){
         xindex <- attr(x, "index")
         effect <- index(xindex, effect)
         Tapply(x, effect, sum)
-    }        
+    }
 }
 
 #' @rdname pseries
@@ -355,7 +355,7 @@ Between.matrix <- function(x, effect,...){
         xindex <- attr(x, "index")
         effect <- index(xindex, effect)
         Tapply(x, effect, mean)
-    }        
+    }
 }
 
 #' @rdname pseries
@@ -400,7 +400,7 @@ between.matrix <- function(x, effect,...){
         xindex <- attr(x, "index")
         effect <- index(xindex, effect)
         apply(x, 2, tapply, effect, mean, ...)
-    }        
+    }
 }
 
 #' @rdname pseries
@@ -422,7 +422,7 @@ Within.pseries <- function(x, effect = c("individual", "time", "group", "twoways
     effect <- match.arg(effect)
     if (effect != "twoways") x - Between(x, effect, ...)
     else{
-        if (is.pbalanced(x)) x - Between(x, "individual", ...) - Between(x, "time") + mean(x)
+        if (is.pbalanced(x)) as.numeric(x) - as.numeric(Between(x, "individual", ...)) - as.numeric(Between(x, "time")) + as.numeric(mean(x))
         else{
             time <- index(x)[[2]]
             Dmu <- model.matrix(~ time - 1)
@@ -473,7 +473,7 @@ Within.matrix <- function(x, effect, rm.null = TRUE, ...){
 
 ############### LAG and DIFF
 #
-# lag/lead/diff for pseries are a wrappers for lagt, leadt, difft (if shift = "time") and 
+# lag/lead/diff for pseries are a wrappers for lagt, leadt, difft (if shift = "time") and
 #                                          for lagr, leadr, diffr (if shift = "row")
 #
 # The "t" and "r" methods are not exported (by intention).
@@ -489,34 +489,34 @@ Within.matrix <- function(x, effect, rm.null = TRUE, ...){
 
 
 #' lag, lead, and diff for panel data
-#' 
+#'
 #' lag, lead, and diff functions for class pseries.
-#' 
+#'
 #' This set of functions perform lagging, leading (lagging in the
 #' opposite direction), and differencing operations on `pseries`
 #' objects, i. e., they take the panel structure of the data into
 #' account by performing the operations per individual.
-#' 
+#'
 #' Argument `shift` controls the shifting of observations to be used
 #' by methods `lag`, `lead`, and `diff`:
-#' 
+#'
 #' #' - `shift = "time"` (default): Methods respect the
 #' numerical value in the time dimension of the index.  The time
 #' dimension needs to be interpretable as a sequence t, t+1, t+2,
 #' \ldots{} where t is an integer (from a technical viewpoint,
 #' `as.numeric(as.character(index(your_pdata.frame)[[2]]))` needs to
 #' result in a meaningful integer).
-#' 
+#'
 #' - `shift = "row": `Methods perform the shifting operation based
 #' solely on the "physical position" of the observations,
 #' i.e. neighbouring rows are shifted per individual. The value in the
 #' time index is not relevant in this case.
-#' 
+#'
 #' For consecutive time periods per individual, a switch of shifting
 #' behaviour results in no difference. Different return values will
 #' occur for non-consecutive time periods per individual
 #' ("holes in time"), see also Examples.
-#' 
+#'
 #' @name lag.plm
 #' @param x a `pseries` object,
 #' @param k an integer, the number of lags for the `lag` and `lead`
@@ -539,56 +539,56 @@ Within.matrix <- function(x, effect, rm.null = TRUE, ...){
 #' - An object of class `pseries`, if the argument specifying the lag
 #'     has length 1 (argument `k` in functions `lag` and `lead`,
 #'     argument `lag` in function `diff`).
-#' 
+#'
 #' - A matrix containing the various series in its columns, if the
 #'     argument specifying the lag has length > 1.
-#' 
+#'
 #' @note The sign of `k` in `lag.pseries` results in inverse behaviour
 #'     compared to [stats::lag()] and [zoo::lag.zoo()].
 #' @author Yves Croissant and Kevin Tappe
 #' @seealso To check if the time periods are consecutive per
 #'     individual, see [is.pconsecutive()].
-#' 
+#'
 #' For further function for 'pseries' objects: [between()],
 #' [Between()], [Within()], [summary.pseries()],
 #' [print.summary.pseries()], [as.matrix.pseries()].
 #' @keywords classes
 #' @examples
-#' 
+#'
 #' # First, create a pdata.frame
 #' data("EmplUK", package = "plm")
 #' Em <- pdata.frame(EmplUK)
-#' 
+#'
 #' # Then extract a series, which becomes additionally a pseries
 #' z <- Em$output
 #' class(z)
-#' 
+#'
 #' # compute the first and third lag, and the difference lagged twice
 #' lag(z)
 #' lag(z, 3)
 #' diff(z, 2)
-#' 
+#'
 #' # compute negative lags (= leading values)
 #' lag(z, -1)
 #' lead(z, 1) # same as line above
 #' identical(lead(z, 1), lag(z, -1)) # TRUE
-#'  
+#'
 #' # compute more than one lag and diff at once (matrix returned)
 #' lag(z, c(1,2))
 #' diff(z, c(1,2))
-#' 
+#'
 #' ## demonstrate behaviour of shift = "time" vs. shift = "row"
 #' # delete 2nd time period for first individual (1978 is missing (not NA)):
 #' Em_hole <- Em[-2, ]
 #' is.pconsecutive(Em_hole) # check: non-consecutive for 1st individual now
-#' 
+#'
 #' # original non-consecutive data:
-#' head(Em_hole$emp, 10) 
+#' head(Em_hole$emp, 10)
 #' # for shift = "time", 1-1979 contains the value of former 1-1977 (2 periods lagged):
 #' head(lag(Em_hole$emp, k = 2, shift = "time"), 10)
 #' # for shift = "row", 1-1979 contains NA (2 rows lagged (and no entry for 1976):
 #' head(lag(Em_hole$emp, k = 2, shift = "row"), 10)
-#' 
+#'
 NULL
 
 #' @rdname lag.plm
@@ -626,7 +626,7 @@ lagt.pseries <- function(x, k = 1, ...) {
   index <- attr(x, "index")
   id <- index[[1]]
   time <- index[[2]]
-  
+
   if (length(k) > 1) {
     rval <- sapply(k, function(i) alagt(x, i))
     colnames(rval) <- k
@@ -649,26 +649,26 @@ difft.pseries <- function(x, lag = 1, ...){
   ## copied/adapted from diffr.pseries except lines which use lagt() ("t") instead of lagr() ("r")
   islogi <- is.logical(x)
   if (! (is.numeric(x) || islogi)) stop("diff is only relevant for numeric or logical series")
-  
+
   non.int <- vapply(lag, function(l) round(l) != l, FUN.VALUE = TRUE)
   if (any(non.int)) stop("Lagging value(s) in 'lag' must be whole-numbered (and non-negative)")
-  
+
   # prevent input of negative values, because it will most likely confuse users
   # what difft would do in this case
   neg <- vapply(lag, function(l) l < 0, FUN.VALUE = TRUE)
   if (any(neg)) stop("diff is only relevant for non-negative values in 'lag'")
-  
+
   lagtx <- lagt.pseries(x, k = lag) # use "time-based" lagging for difft
-  
+
   if (is.matrix(lagtx)) {
     # if 'lagtx' is matrix (case length(lag) > 1):
-    # perform subtraction without pseries feature of 'x', because otherwise 
+    # perform subtraction without pseries feature of 'x', because otherwise
     # the result would be c("pseries", "matrix") which is not supported
     res <- as.numeric(x) - lagtx
   } else {
     res <- x - lagtx
   }
-  
+
   return(res)
 }
 
@@ -680,45 +680,45 @@ alagt <- function(x, ak) {
     index <- attr(x, "index")
     id   <- index[[1]]
     time <- index[[2]]
-    
+
     # Idea: split times in blocks per individuals and do lagging there
     # by computation of correct time shifting
-    
+
     # need to convert to numeric, do this by coering to character
     # first (otherwise wrong results!)
-    #  see R FAQ 7.10 for coercing factors to numeric: 
+    #  see R FAQ 7.10 for coercing factors to numeric:
     #      as.numeric(levels(factor_var))[as.integer(factor_var)] is
     #      more efficient than
     #      as.numeric(as.character(factor_var))
 
     time <- as.numeric(levels(time))[as.integer(time)]
-    
+
     list_id_timevar <- split(time, id, drop = TRUE)
-    
-    index_lag_ak_all_list <- sapply(X = list_id_timevar, 
-                                    FUN = function(id_timevar) { 
+
+    index_lag_ak_all_list <- sapply(X = list_id_timevar,
+                                    FUN = function(id_timevar) {
                                       index_lag_ak <- match(id_timevar - ak, id_timevar, incomparables = NA)
                                     },
                                     simplify = FALSE)
-    
+
     # translate blockwise positions to positions in full vector
     index_lag_ak_all <- unlist(index_lag_ak_all_list, use.names = FALSE)
-    
+
     NApos <- is.na(index_lag_ak_all) # save NA positions for later
     substitute_blockwise <- index_lag_ak_all
-    
+
     block_lengths <- vapply(index_lag_ak_all_list, length, FUN.VALUE = 1L) # lengths (with an "s") would be more efficient, but requires R >= 3.2
-    
+
     # not needed but leave here for illustration:
     #    startpos_block <- cumsum(block_lengths) - block_lengths + 1
     #    endpos_block <- startpos_block + block_lengths - 1
-    
+
     indexes_blockwise <- unlist(sapply(block_lengths, function(x) seq(from = 1, to = x), simplify = FALSE), use.names = FALSE)
-    
+
     orig_pos_x <- seq.int(x) # make vector with indexes for original input
     new_pos <- orig_pos_x - (indexes_blockwise - substitute_blockwise) # calc. new positions
     new_pos[NApos] <- orig_pos_x[NApos] # fill NAs with arbitrary values to allow proper subsetting in next step
-    
+
     orig_attr <- attributes(x)
     x <- x[new_pos] # re-arrange according to lagging
     x[NApos] <- NA  # set NAs where necessary
@@ -733,7 +733,7 @@ lagr.pseries <- function(x, k = 1, ...) {
     index <- attr(x, "index")
     id <- index[[1]]
     time <- index[[2]]
-  
+
     # catch the case when an index of pdata.frame shall be lagged
     # (index variables are always factors) NB: this catches -
     # unintentionally - also the case when a factor variable is the
@@ -745,44 +745,44 @@ lagr.pseries <- function(x, k = 1, ...) {
     # (all(as.character(x) == as.character(id)) |
     # all(as.character(x)==as.character(time))) stop("Lagged vector
     # cannot be index.")
-  
+
     alagr <- function(x, ak){
         if (round(ak) != ak) stop("Lagging value 'k' must be whole-numbered (positive, negative or zero)")
         if (ak > 0) {
-      
+
         # NB: this code does row-wise shifting
 
         # delete first ak observations for each unit
             isNAtime <- c(rep(T, ak), (diff(as.numeric(time), lag = ak) != ak))
             isNAid   <- c(rep(T, ak), (diff(as.numeric(id),   lag = ak) != 0))
             isNA <- (isNAtime | isNAid)
-      
+
             result <- x                                             # copy x first ...
-            result[1:ak] <- NA                                      # ... then make first ak obs NA ... 
+            result[1:ak] <- NA                                      # ... then make first ak obs NA ...
             result[(ak+1):length(result)] <- x[1:(length(x)-ak)]    # ... shift and ...
             result[isNA] <- NA                                      # ... make more NAs in between: this way, we keep: all factor levels, names, classes
-      
+
         } else if (ak < 0) { # => compute leading values
-      
+
         # delete last |ak| observations for each unit
             num_time <- as.numeric(time)
             num_id   <- as.numeric(id)
             isNAtime <- c(c((num_time[1:(length(num_time)+ak)] - num_time[(-ak+1):length(num_time)]) != ak), rep(T, -ak))
             isNAid   <- c(c((num_id[1:(length(num_id)+ak)]     - num_id[(-ak+1):length(num_id)])     != 0),  rep(T, -ak))
             isNA <- (isNAtime | isNAid)
-      
+
             result <- x                                            # copy x first ...
-            result[(length(result)+ak+1):length(result)] <- NA     # ... then make last |ak| obs NA ... 
+            result[(length(result)+ak+1):length(result)] <- NA     # ... then make last |ak| obs NA ...
             result[1:(length(result)+ak)] <- x[(1-ak):(length(x))] # ... shift and ...
             result[isNA] <- NA                                     # ... make more NAs in between: this way, we keep: all factor levels, names, classes
-      
+
         } else { # ak == 0 => nothing to do, return original pseries (no lagging/no leading)
             result <- x
         }
-        
+
         return(result)
     } # END function alagr
-  
+
     if (length(k) > 1) {
         rval <- sapply(k, function(i) alagr(x, i))
         colnames(rval) <- k
@@ -805,20 +805,20 @@ leadr.pseries <- function(x, k = 1, ...) {
 diffr.pseries <- function(x, lag = 1, ...){
     islogi <- is.logical(x)
     if (! (is.numeric(x) || islogi)) stop("diff is only relevant for numeric or logical series")
-    
+
     non.int <- vapply(lag, function(l) round(l) != l, FUN.VALUE = TRUE)
     if (any(non.int)) stop("Lagging value(s) in 'lag' must be whole-numbered (and non-negative)")
-    
+
     # prevent input of negative values, because it will most likely confuse users
     # what diff would do in this case
     neg <- vapply(lag, function(l) l < 0, FUN.VALUE = TRUE)
     if (any(neg)) stop("diff is only relevant for non-negative values in 'lag'")
 
     lagrx <- lagr.pseries(x, k = lag)
-    
+
     if (is.matrix(lagrx)) {
       # if 'lagrx' is matrix (case length(lag) > 1):
-      # perform subtraction without pseries feature of 'x', because otherwise 
+      # perform subtraction without pseries feature of 'x', because otherwise
       # the result would be c("pseries", "matrix") which is not supported
       res <- as.numeric(x) - lagrx
     } else {
